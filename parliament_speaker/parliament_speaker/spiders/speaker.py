@@ -6,7 +6,7 @@ class Helper():
         return lambda a : a.strip()
         
     def parseTable(table):
-        rows = table.css("tr")
+        rows = table.css("tbody tr")       
         return rows
 
     def parseRow(row):
@@ -18,12 +18,23 @@ class Helper():
         if cellText is not None:
             cellText = cellText.strip()
             cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces
-        # uniString = unicode(cellText, "UTF-8")
-        # uniString = uniString.replace(u"\u00A0", " ")
         return cellText
 
-    
+    def parseTableHeader(table):
+        headerRow = table.css("thead tr")
+        return headerRow
 
+    def parseHeaderRow(row):        
+        cells = row.css("th")
+        return cells
+
+    def parseHeaderCells(cell):
+        cellText = cell.css("::text").getall()
+        cellText = " ".join(cellText)
+        if cellText is not None:
+            cellText = cellText.strip()
+            cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces
+        return cellText
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
@@ -48,20 +59,33 @@ class QuotesSpider(scrapy.Spider):
             for str in captions:
                 if str.casefold().startswith(regularTop):
                     tables = block.css("table") #[3].css("tr td span::text,a::text").getall()
-
-                    for table in tables:
+                    
+                    for table in tables:                        
+                        headerDict = self.getTableHeaderAsDict(table)
                         parsedTable = Helper.parseTable(table)
                         for row in parsedTable:
                             parsedRow = Helper.parseRow(row)
-
                             i = 0
                             dict = {}
                             for cell in parsedRow:
                                 parsedCell = Helper.parseCells(cell)
-                                dict[i] = parsedCell
+                                key = headerDict[i]
+                                dict[key] = parsedCell
                                 i = i + 1
 
                             yield dict
+
+    def getTableHeaderAsDict(self, table):
+        parsedTable = Helper.parseTableHeader(table)
+        for row in parsedTable:
+            parsedRow = Helper.parseHeaderRow(row)
+            i = 0
+            headerDict = {}
+            for cell in parsedRow:
+                parsedCell = Helper.parseHeaderCells(cell)
+                headerDict[i] = parsedCell
+                i = i + 1
+        return headerDict
                             
             # if (caption is not None and caption.casefold.startswith(regularTop)):                
             #     test = 'test'#block.css('table')[2].css('tr td').get().strip()
