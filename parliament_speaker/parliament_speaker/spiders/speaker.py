@@ -1,43 +1,50 @@
 import scrapy
 import re
+from enum import Enum
 
-class Helper():
-    def stripCharsFromList():
-        return lambda a : a.strip()
-        
-    def parseTable(table):
-        rows = table.css("tbody tr")       
+class TableType(Enum):
+    tableHeader = "table-header"
+    tableContent = "table-content"
+
+
+cssSelectors = {
+    TableType.tableHeader : { 
+        "row" : "thead tr",
+        "cell": "th",
+        "cell-content": "::text",
+     },
+     TableType.tableContent : {
+        "row" : "tbody tr",
+        "cell": "td",
+        "cell-content": "span.table-responsive__inner::text, a::text",
+     }
+}
+
+class Helper():        
+    def parseTable(table, tableType):
+        rows = table.css(cssSelectors[tableType]["row"])       
         return rows
 
-    def parseRow(row):
-        cells = row.css("td")
+    def parseRow(row, tableType):
+        cells = row.css(cssSelectors[tableType]["cell"])
         return cells
         
-    def parseCells(cell):
-        cellText = cell.css("span.table-responsive__inner::text, a::text").get()
-        if cellText is None:
-            cellText = cell.css("td.table-responsive__header::text").get()
+    def parseCells(cell, tableType):
+        cellSelector = cell.css(cssSelectors[tableType]["cell-content"])
+
+        if tableType == TableType.tableHeader:
+            cellText = cellSelector.getall()
+            cellText = " ".join(cellText)
+        if tableType == TableType.tableContent:
+            cellText = cellSelector.get()
+            if cellText is None:
+                cellText = cell.css("td.table-responsive__header::text").get() # alternative parsing for special tables...
 
         if cellText is not None:
             cellText = cellText.strip()
             cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces
         return cellText
 
-    def parseTableHeader(table):
-        headerRow = table.css("thead tr")
-        return headerRow
-
-    def parseHeaderRow(row):        
-        cells = row.css("th")
-        return cells
-
-    def parseHeaderCells(cell):
-        cellText = cell.css("::text").getall()
-        cellText = " ".join(cellText)
-        if cellText is not None:
-            cellText = cellText.strip()
-            cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces
-        return cellText
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
@@ -53,49 +60,33 @@ class QuotesSpider(scrapy.Spider):
         regularTop = 'TOP'.casefold()
         shortTop = 'Kurze Debatte'.casefold()
 
-
-        # stripAll = lambda a : a.strip()
         for block in response.css('div.reiterBlock'):
             # captions = []
             captions = block.css('h3::text').getall()
             test = 'nix'
             for str in captions:
                 if str.casefold().startswith(regularTop):
-                    tables = block.css("table") #[3].css("tr td span::text,a::text").getall()
+                    tables = block.css("table")
                     
                     for table in tables:                        
-                        headerDict = self.getTableHeaderAsDict(table)
-                        parsedTable = Helper.parseTable(table)
-                        for row in parsedTable:
-                            parsedRow = Helper.parseRow(row)
-                            i = 0
-                            dict = {}
-                            for cell in parsedRow:
-                                parsedCell = Helper.parseCells(cell)
-                                key = headerDict[i]
-                                dict[key] = parsedCell
-                                i = i + 1
+                        headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
+                        resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+                        yield from resultDict
 
-                            yield dict
-
-    def getTableHeaderAsDict(self, table):
-        parsedTable = Helper.parseTableHeader(table)
+    def getTableTextAsDict(self, table, tableType, keyDict):
+        parsedTable = Helper.parseTable(table, tableType)
         for row in parsedTable:
-            parsedRow = Helper.parseHeaderRow(row)
+            parsedRow = Helper.parseRow(row, tableType)
             i = 0
-            headerDict = {}
+            content = {}
             for cell in parsedRow:
-                parsedCell = Helper.parseHeaderCells(cell)
-                headerDict[i] = parsedCell
-                i = i + 1
-        return headerDict
-                            
-            # if (caption is not None and caption.casefold.startswith(regularTop)):                
-            #     test = 'test'#block.css('table')[2].css('tr td').get().strip()
-            # yield {
-            #     # 'test': block.css('h3::text').getall(),
-            #     'test': test
-            # }
-            
+                parsedCell = Helper.parseCells(cell, tableType)
 
-    
+                if keyDict is not None:
+                    key = keyDict[i]
+                else:
+                    key = i
+                content[key] = parsedCell
+                i += 1
+            yield content
+                            
