@@ -4,6 +4,21 @@ import re
 class Helper():
     def stripCharsFromList():
         return lambda a : a.strip()
+        
+    def parseTable(table):
+        rows = table.css("tr")
+        return rows
+
+    def parseRow(row):
+        cells = row.css("td")
+        return cells
+        
+    def parseCells(cell):
+        cellText = cell.css("span.table-responsive__inner::text, a::text").get()
+        return cellText
+
+    
+
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
@@ -30,22 +45,21 @@ class QuotesSpider(scrapy.Spider):
                     tables = block.css("table") #[3].css("tr td span::text,a::text").getall()
 
                     for table in tables:
-                        content = table.css("tr td span::text,a::text").getall()
-                        
-                        # there is a list full of key value pairs, so we need to transform these into a dict
-                        dict = {}
-                        for i in range((int( len(content) / 2))):                            
-                            dict[content[i*2]] = content[(i*2)+1]
-                        # content = list(map(lambda x: x.strip(), content))
-                        
-                    # for i in test.range() / 2:
-                    #     dict[test[i*2]] = test[i*2+1]
-                    #dict['hallo'] = 1
-                    # dict[test[0]] = test[1]
-                        yield {
-                            # 'test': block.css('h3::text').getall(),
-                            'test': dict
-                        }
+                        parsedTable = Helper.parseTable(table)
+                        for row in parsedTable:
+                            parsedRow = Helper.parseRow(row)
+
+                            i = 0
+                            dict = {}
+                            for cell in parsedRow:
+                                parsedCell = Helper.parseCells(cell)
+                                dict[i] = parsedCell
+                                i = i + 1
+
+                            yield {
+                                # 'test': block.css('h3::text').getall(),
+                                'test': dict
+                            }
             # if (caption is not None and caption.casefold.startswith(regularTop)):                
             #     test = 'test'#block.css('table')[2].css('tr td').get().strip()
             # yield {
