@@ -14,7 +14,10 @@ class Helper():
         return cells
         
     def parseCells(cell):
-        cellText = cell.css("span.table-responsive__inner::text, a::text").get()#.split()
+        cellText = cell.css("span.table-responsive__inner::text, a::text").get()
+        if cellText is None:
+            cellText = cell.css("td.table-responsive__header::text").get()
+
         if cellText is not None:
             cellText = cellText.strip()
             cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces

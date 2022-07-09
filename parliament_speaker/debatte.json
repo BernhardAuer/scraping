@@ -1,6 +1,6 @@
 [
-{"in Minuten": null, "ÖVP": "88", "SPÖ": "61", "FPÖ": "50", "GRÜNE": "45", "NEOS": "36"},
-{"Abgeordnete ohne Klub": null, "Redezeitbeschränkung": "18"},
+{"in Minuten": "Gesamtredezeitbeschränkung", "ÖVP": "88", "SPÖ": "61", "FPÖ": "50", "GRÜNE": "45", "NEOS": "36"},
+{"Abgeordnete ohne Klub": "Pia Philippa Strache", "Redezeitbeschränkung": "18"},
 {"Nr.": "1", "Rede beendet": "+", "Redner/-innen": "Michael Schnedlitz (F)", "Anz. WM": "", "Art der Wortmeldung WM": "un", "Start": "15:01", "Dauer": "9:18", "Limit": "10"},
 {"Nr.": "2", "Rede beendet": "+", "Redner/-innen": "BM Johannes Rauch (G)", "Anz. WM": "", "Art der Wortmeldung WM": "rb", "Start": "15:10", "Dauer": "3:07", "Limit": "0"},
 {"Nr.": "3", "Rede beendet": "+", "Redner/-innen": "Dr. Werner Saxinger, MSc (V)", "Anz. WM": "", "Art der Wortmeldung WM": "kd", "Start": "15:14", "Dauer": "4:13", "Limit": "5"},
