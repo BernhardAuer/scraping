@@ -14,7 +14,12 @@ class Helper():
         return cells
         
     def parseCells(cell):
-        cellText = cell.css("span.table-responsive__inner::text, a::text").get()
+        cellText = cell.css("span.table-responsive__inner::text, a::text").get()#.split()
+        if cellText is not None:
+            cellText = cellText.strip()
+            cellText = cellText.replace("\u00A0", " ") # replace html non breaking spaces
+        # uniString = unicode(cellText, "UTF-8")
+        # uniString = uniString.replace(u"\u00A0", " ")
         return cellText
 
     
@@ -56,10 +61,8 @@ class QuotesSpider(scrapy.Spider):
                                 dict[i] = parsedCell
                                 i = i + 1
 
-                            yield {
-                                # 'test': block.css('h3::text').getall(),
-                                'test': dict
-                            }
+                            yield dict
+                            
             # if (caption is not None and caption.casefold.startswith(regularTop)):                
             #     test = 'test'#block.css('table')[2].css('tr td').get().strip()
             # yield {
