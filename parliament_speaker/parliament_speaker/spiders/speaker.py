@@ -2,8 +2,8 @@ import scrapy
 import re
 
 class Helper():
-    def parse():
-        print("Das ist ein Test")
+    def stripCharsFromList():
+        return lambda a : a.strip()
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
@@ -31,14 +31,20 @@ class QuotesSpider(scrapy.Spider):
 
                     for table in tables:
                         content = table.css("tr td span::text,a::text").getall()
+                        
+                        # there is a list full of key value pairs, so we need to transform these into a dict
                         dict = {}
+                        for i in range((int( len(content) / 2))):                            
+                            dict[content[i*2]] = content[(i*2)+1]
+                        # content = list(map(lambda x: x.strip(), content))
+                        
                     # for i in test.range() / 2:
                     #     dict[test[i*2]] = test[i*2+1]
                     #dict['hallo'] = 1
                     # dict[test[0]] = test[1]
                         yield {
                             # 'test': block.css('h3::text').getall(),
-                            'test': content
+                            'test': dict
                         }
             # if (caption is not None and caption.casefold.startswith(regularTop)):                
             #     test = 'test'#block.css('table')[2].css('tr td').get().strip()
