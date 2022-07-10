@@ -20,7 +20,7 @@ class TransformPipeline:
         "Art der Wortmeldung WM": "TypeOfSpeak",
         "Start": "Start",
         "Dauer": "LengthOfSpeak",
-        "Limi": "LimitOfSpeak"
+        "Limit": "LimitOfSpeak"
     }
     
     def mapDictKeys(self, dict):
