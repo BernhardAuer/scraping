@@ -1,6 +1,7 @@
 import scrapy
 import re
 from enum import Enum
+from ..items import SpeakerItem
 
 class TableType(Enum):
     tableHeader = "table-header"
@@ -71,6 +72,9 @@ class QuotesSpider(scrapy.Spider):
                     for table in tables:                        
                         headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
                         resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+                        # d = {k:v for k, v in resultDict}
+                        # for t in resultDict:
+                        #     yield SpeakerItem(t)
                         yield from resultDict
 
     def getTableTextAsDict(self, table, tableType, keyDict):
