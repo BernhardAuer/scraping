@@ -7,6 +7,14 @@ class TableType(Enum):
     tableHeader = "table-header"
     tableContent = "table-content"
 
+contentBlock = {    
+    0 : "uebersicht",   
+    1 : "sitzungsverlauf",
+    2 : "beschluesse",
+    3 : "rednerinnen",
+    4 : "vorl_steno_protokoll"
+}
+
 
 cssSelectors = {
     TableType.tableHeader : { 
@@ -50,7 +58,7 @@ class Helper():
 class QuotesSpider(scrapy.Spider):
     name = "topics"
     start_urls = [
-        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00165/index.shtml',
+        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00162/index.shtml',
     ]
     custom_settings = {
     "FEED_EXPORT_ENCODING": "utf-8"
@@ -61,21 +69,22 @@ class QuotesSpider(scrapy.Spider):
         regularTop = 'TOP'.casefold()
         shortTop = 'Kurze Debatte'.casefold()
 
-        for block in response.css('div.reiterBlock'):
-            # captions = []
-            captions = block.css('h3::text').getall()
-            test = 'nix'
-            for str in captions:
-                if str.casefold().startswith(regularTop):
-                    tables = block.css("table")
-                    
-                    for table in tables:                        
-                        headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
-                        resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
-                        # d = {k:v for k, v in resultDict}
-                        # for t in resultDict:
-                        #     yield SpeakerItem(t)
-                        yield from resultDict
+        # for block in response.css('div.reiterBlock'):
+        block = response.css('div.reiterBlock')[3]
+        # captions = []
+        captions = block.css('h3::text').getall()
+        test = 'nix'
+        # for str in captions:
+            # if str.casefold().startswith(regularTop):
+        tables = block.css("table")
+        
+        for table in tables:                        
+            headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
+            resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+            # d = {k:v for k, v in resultDict}
+            # for t in resultDict:
+            #     yield SpeakerItem(t)
+            yield from resultDict
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
