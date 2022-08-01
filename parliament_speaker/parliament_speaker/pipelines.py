@@ -16,7 +16,7 @@ from itemadapter import ItemAdapter
 class TransformPipeline:
     mappingDict = {
         "Nr.": "Nr",
-        "Rede beendet": "HasSpeakingFinished",
+        "Rede beendet": "HasSpeakingFinishedRaw",
         "Redner/-innen": "NameOfSpeaker",
         "Anz. WM": "NumberOfSpeakes",
         "Art der Wortmeldung WM": "TypeOfSpeak",

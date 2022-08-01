@@ -3,20 +3,26 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
+from datetime import date
+from operator import truediv
 from pydantic import validate_arguments
-import scrapy
 
-@validate_arguments
 @dataclass
-class SpeakerItem:  
-
+class SpeakerItem:
+   
     Nr: int
-    HasSpeakingFinished: str
+    HasSpeakingFinished: bool = field(init=False)
     NameOfSpeaker : str
-    NumberOfSpeakes: str
     TypeOfSpeak : str
     Start: str
     LimitOfSpeak: str
     LengthOfSpeak: str
-
+    NumberOfSpeakes: str
+    HasSpeakingFinishedRaw: InitVar[str]
+    #TypeOfSpeakRaw: InitVar[str] = None
+    def __post_init__(self, _HasSpeakingFinishedRaw):
+        if _HasSpeakingFinishedRaw== '+':
+            self.HasSpeakingFinished = True
+        else:
+            self.HasSpeakingFinished = False
