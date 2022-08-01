@@ -10,10 +10,11 @@ import scrapy
 class SpeakerItem:  
 
     Nr: int
-    # HasSpeakingFinished: str
+    HasSpeakingFinished: str
     NameOfSpeaker : str
-    # NumberOfSpeakes: str
-    # TypeOfSpeak : str
-    # Start: str
-    # Dauer: str
+    NumberOfSpeakes: str
+    TypeOfSpeak : str
+    Start: str
+    LimitOfSpeak: str
+    LengthOfSpeak: str
 

@@ -77,15 +77,14 @@ class QuotesSpider(scrapy.Spider):
         # for str in captions:
             # if str.casefold().startswith(regularTop):
         tables = block.css("table")
-        test = SpeakerItem(Nr=1, NameOfSpeaker="test")
-        yield test
-        # for table in tables:                        
-        #     headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
-        #     resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
-        #     # d = {k:v for k, v in resultDict}
-        #     # for t in resultDict:
-        #     #     yield SpeakerItem(t)
-        #     yield from SpeakerItem({"Nr": 18, "NameOfSpeaker": "dei Mudder"})
+        
+        for table in tables:                        
+            headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
+            resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+            # d = {k:v for k, v in resultDict}
+            # for t in resultDict:
+            #     yield SpeakerItem(t)
+            yield from resultDict #SpeakerItem({"Nr": 18, "NameOfSpeaker": "dei Mudder"})
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
