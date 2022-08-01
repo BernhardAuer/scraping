@@ -6,6 +6,7 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from parliament_speaker.items import SpeakerItem
 import pymongo
 import sys
 import keyword
@@ -82,6 +83,6 @@ class MongoDBPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
-        data = (item) # needs to be a dict?
+        data = item.__dict__ # needs to be a dict?
         self.db[self.collection].insert_one(data)
         return item

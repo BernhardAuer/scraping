@@ -3,17 +3,17 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
+from dataclasses import dataclass
 import scrapy
 
+@dataclass
+class SpeakerItem:  
 
-class SpeakerItem(scrapy.Item):
-    
-
-    Nr = scrapy.Field()
-    HasSpeakingFinished = scrapy.Field()
-    NameOfSpeaker = scrapy.Field()
-    NumberOfSpeakes = scrapy.Field()
-    TypeOfSpeak = scrapy.Field()
-    Start = scrapy.Field()
-    Dauer = scrapy.Field()
+    Nr: int
+    # HasSpeakingFinished: str
+    NameOfSpeaker : str
+    # NumberOfSpeakes: str
+    # TypeOfSpeak : str
+    # Start: str
+    # Dauer: str
 
