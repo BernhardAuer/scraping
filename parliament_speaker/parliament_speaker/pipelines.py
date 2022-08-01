@@ -83,6 +83,7 @@ class MongoDBPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
-        data = item.__dict__ # needs to be a dict?
+        adapter = ItemAdapter(item)
+        data = adapter.asdict()
         self.db[self.collection].insert_one(data)
         return item
