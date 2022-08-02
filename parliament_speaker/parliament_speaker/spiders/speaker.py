@@ -14,6 +14,16 @@ contentBlock = {
     3 : "rednerinnen",
     4 : "vorl_steno_protokoll"
 }
+# some consts
+regularTop = 'TOP'.casefold().strip()
+shortTop = 'Kurze Debatte'.casefold().strip()
+urgentRequest = 'Dringl'.casefold().strip() # dringl anfrage / dringliche anfrage / ...
+hotTopic = 'Aktuelle Stunde:'.casefold().strip()
+randomTopic = '"'.casefold().strip()
+speechTimeLimits = 'Blockredezeit'.casefold().strip()
+speechTimeLimitSingles = 'Redezeitbeschränkungen'.casefold().strip()
+
+tableCaptionsStartChars = [regularTop, urgentRequest, hotTopic, randomTopic, speechTimeLimits, speechTimeLimitSingles]
 
 
 cssSelectors = {
@@ -58,7 +68,7 @@ class Helper():
 class QuotesSpider(scrapy.Spider):
     name = "topics"
     start_urls = [
-        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00162/index.shtml',
+        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00141/index.shtml',
     ]
     custom_settings = {
     "FEED_EXPORT_ENCODING": "utf-8"
@@ -66,12 +76,20 @@ class QuotesSpider(scrapy.Spider):
    
     def parse(self, response):
         block = response.css('div.reiterBlock')[3]
+
+        captions = block.css('h3::text, h6 a::text').getall()
+        filteredCaptions = list(filter(lambda cap: cap.casefold().strip().startswith(tuple(tableCaptionsStartChars)), captions))
+
         tables = block.css("table")
-        
-        for table in tables:                        
+        i = 0
+        for table in tables:   
+            tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else ""
+            print("-----------------------------------------------------------------------------" + tableCaption)                 
             headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
             resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+            i += 1
             yield from resultDict
+        
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
