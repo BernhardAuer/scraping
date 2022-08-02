@@ -65,26 +65,13 @@ class QuotesSpider(scrapy.Spider):
     }
    
     def parse(self, response):
-        # some consts
-        regularTop = 'TOP'.casefold()
-        shortTop = 'Kurze Debatte'.casefold()
-
-        # for block in response.css('div.reiterBlock'):
         block = response.css('div.reiterBlock')[3]
-        # captions = []
-        captions = block.css('h3::text').getall()
-        test = 'nix'
-        # for str in captions:
-            # if str.casefold().startswith(regularTop):
         tables = block.css("table")
         
         for table in tables:                        
             headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
             resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
-            # d = {k:v for k, v in resultDict}
-            # for t in resultDict:
-            #     yield SpeakerItem(t)
-            yield from resultDict #SpeakerItem({"Nr": 18, "NameOfSpeaker": "dei Mudder"})
+            yield from resultDict
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
