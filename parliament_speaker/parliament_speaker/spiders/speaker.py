@@ -15,15 +15,15 @@ contentBlock = {
     4 : "vorl_steno_protokoll"
 }
 # some consts
-regularTop = 'TOP'.casefold().strip()
-shortTop = 'Kurze Debatte'.casefold().strip()
-urgentRequest = 'Dringl'.casefold().strip() # dringl anfrage / dringliche anfrage / ...
-hotTopic = 'Aktuelle Stunde:'.casefold().strip()
-randomTopic = '"'.casefold().strip()
-speechTimeLimits = 'Blockredezeit'.casefold().strip()
-speechTimeLimitSingles = 'Redezeitbeschränkungen'.casefold().strip()
+regularTop = 'TOP'
+shortTop = 'Kurze Debatte'
+urgentRequest = 'Dringl' # dringl anfrage / dringliche anfrage / ...
+hotTopic = 'Aktuelle Stunde:'
+randomTopic = '"'
+speechTimeLimits = 'Blockredezeit'
+speechTimeLimitSingles = 'Redezeitbeschränkungen'
 
-tableCaptionsStartChars = [regularTop, urgentRequest, hotTopic, randomTopic, speechTimeLimits, speechTimeLimitSingles]
+tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic, speechTimeLimits, speechTimeLimitSingles]))
 
 
 cssSelectors = {
@@ -83,7 +83,7 @@ class QuotesSpider(scrapy.Spider):
         tables = block.css("table")
         i = 0
         for table in tables:   
-            tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else ""
+            tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else "unknown table"
             print("-----------------------------------------------------------------------------" + tableCaption)                 
             headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
             resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
