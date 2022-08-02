@@ -6,23 +6,32 @@
 from dataclasses import dataclass, field, InitVar
 from datetime import date
 from operator import truediv
-from pydantic import validate_arguments
 
 @dataclass
 class SpeakerItem:
    
     Nr: int
-    HasSpeakingFinished: bool = field(init=False)
+    HasSpeechFinished: bool = field(init=False)    
+    SpeechNumberOfTopicByAuthor: int = field(init=False)
     NameOfSpeaker : str
-    TypeOfSpeak : str
+    TypeOfSpeech : str
     Start: str
-    LimitOfSpeak: str
-    LengthOfSpeak: str
-    NumberOfSpeakes: str
-    HasSpeakingFinishedRaw: InitVar[str]
-    #TypeOfSpeakRaw: InitVar[str] = None
-    def __post_init__(self, _HasSpeakingFinishedRaw):
-        if _HasSpeakingFinishedRaw== '+':
-            self.HasSpeakingFinished = True
+    TimeLimit: str
+    LengthOfSpeech: str
+    TypeOfSpeech: str
+    SpeechNumberOfTopicByAuthorRaw: InitVar[str] = None
+    HasSpeechFinishedRaw: InitVar[str] = None
+    def __post_init__(self, SpeechNumberOfTopicByAuthorRaw, HasSpeechFinishedRaw): # order is relevant... OMG!!!!!!
+        if HasSpeechFinishedRaw== '+':
+            self.HasSpeechFinished = True
         else:
-            self.HasSpeakingFinished = False
+            self.HasSpeechFinished = False
+
+        if SpeechNumberOfTopicByAuthorRaw == "":
+            self.SpeechNumberOfTopicByAuthor = 1
+        else:            
+            self.SpeechNumberOfTopicByAuthor = int(SpeechNumberOfTopicByAuthorRaw)
+
+
+        
+

@@ -16,13 +16,13 @@ from itemadapter import ItemAdapter
 class TransformPipeline:
     mappingDict = {
         "Nr.": "Nr",
-        "Rede beendet": "HasSpeakingFinishedRaw",
+        "Rede beendet": "HasSpeechFinishedRaw",
         "Redner/-innen": "NameOfSpeaker",
-        "Anz. WM": "NumberOfSpeakes",
-        "Art der Wortmeldung WM": "TypeOfSpeak",
+        "Anz. WM": "SpeechNumberOfTopicByAuthorRaw",
+        "Art der Wortmeldung WM": "TypeOfSpeech",
         "Start": "Start",
-        "Dauer": "LengthOfSpeak",
-        "Limit": "LimitOfSpeak"
+        "Dauer": "LengthOfSpeech",
+        "Limit": "TimeLimit"
     }
     
     def mapDictKeys(self, dict):
