@@ -32,6 +32,8 @@ class SpeakerItem:
         else:            
             self.SpeechNumberOfTopicByAuthor = int(SpeechNumberOfTopicByAuthorRaw)
 
+        self.Nr = int(self.Nr)
+
 
         
 
