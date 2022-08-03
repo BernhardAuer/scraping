@@ -7,6 +7,24 @@ class TableType(Enum):
     tableHeader = "table-header"
     tableContent = "table-content"
 
+contentBlock = {    
+    0 : "uebersicht",   
+    1 : "sitzungsverlauf",
+    2 : "beschluesse",
+    3 : "rednerinnen",
+    4 : "vorl_steno_protokoll"
+}
+# some consts
+regularTop = 'TOP'
+shortTop = 'Kurze Debatte'
+urgentRequest = 'Dringl' # dringl anfrage / dringliche anfrage / ...
+hotTopic = 'Aktuelle Stunde:'
+randomTopic = '"'
+#speechTimeLimits = 'Blockredezeit'
+#speechTimeLimitSingles = 'Redezeitbeschränkungen'
+
+tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic]))
+
 
 cssSelectors = {
     TableType.tableHeader : { 
@@ -50,32 +68,28 @@ class Helper():
 class QuotesSpider(scrapy.Spider):
     name = "topics"
     start_urls = [
-        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00165/index.shtml',
+        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00141/index.shtml',
     ]
     custom_settings = {
     "FEED_EXPORT_ENCODING": "utf-8"
     }
    
     def parse(self, response):
-        # some consts
-        regularTop = 'TOP'.casefold()
-        shortTop = 'Kurze Debatte'.casefold()
+        block = response.css('div.reiterBlock')[3]
 
-        for block in response.css('div.reiterBlock'):
-            # captions = []
-            captions = block.css('h3::text').getall()
-            test = 'nix'
-            for str in captions:
-                if str.casefold().startswith(regularTop):
-                    tables = block.css("table")
-                    
-                    for table in tables:                        
-                        headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
-                        resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
-                        # d = {k:v for k, v in resultDict}
-                        # for t in resultDict:
-                        #     yield SpeakerItem(t)
-                        yield from resultDict
+        captions = block.css('h3::text, h6 a::text').getall()
+        filteredCaptions = list(filter(lambda cap: cap.casefold().strip().startswith(tuple(tableCaptionsStartChars)), captions))
+
+        tables = block.css("table[summary='Rednerinnen und Redner der Debatte']")        
+        i = 0
+        for table in tables:   
+            tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else "unknown table"
+            print("-----------------------------------------------------------------------------" + tableCaption)                 
+            headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
+            resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+            i += 1
+            yield from resultDict
+        
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
