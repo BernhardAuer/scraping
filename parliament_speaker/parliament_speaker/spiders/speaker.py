@@ -20,10 +20,10 @@ shortTop = 'Kurze Debatte'
 urgentRequest = 'Dringl' # dringl anfrage / dringliche anfrage / ...
 hotTopic = 'Aktuelle Stunde:'
 randomTopic = '"'
-speechTimeLimits = 'Blockredezeit'
-speechTimeLimitSingles = 'Redezeitbeschränkungen'
+#speechTimeLimits = 'Blockredezeit'
+#speechTimeLimitSingles = 'Redezeitbeschränkungen'
 
-tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic, speechTimeLimits, speechTimeLimitSingles]))
+tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic]))
 
 
 cssSelectors = {
@@ -80,7 +80,7 @@ class QuotesSpider(scrapy.Spider):
         captions = block.css('h3::text, h6 a::text').getall()
         filteredCaptions = list(filter(lambda cap: cap.casefold().strip().startswith(tuple(tableCaptionsStartChars)), captions))
 
-        tables = block.css("table")
+        tables = block.css("table[summary='Rednerinnen und Redner der Debatte']")        
         i = 0
         for table in tables:   
             tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else "unknown table"
