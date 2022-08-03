@@ -1,3 +1,4 @@
+from parliament_plenarsitzungen.items import ParliamentPlenarsitzungenItem
 import scrapy
 import re
 
@@ -10,10 +11,12 @@ class ParliamentarySessionsSpider(scrapy.Spider):
    
     def parse(self, response):
         for quote in response.css('item'):
-            yield {
-                'title': quote.css('title::text').get().strip(),
-                'pubDate': quote.css('pubDate::text').get().strip(),
-                'link': quote.css('link::text').get().strip(),
-            }
+            item = ParliamentPlenarsitzungenItem(
+                Title=quote.css('title::text').get().strip(),
+                DateRaw=quote.css('pubDate::text').get().strip(),
+                Link=quote.css('link::text').get().strip()
+                )
+            #item.parse_date(item.date)
+            yield item
 
     
