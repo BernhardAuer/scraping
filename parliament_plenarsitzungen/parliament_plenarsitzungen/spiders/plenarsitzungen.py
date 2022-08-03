@@ -2,8 +2,8 @@ import scrapy
 import re
 
 
-class QuotesSpider(scrapy.Spider):
-    name = "quotes"
+class ParliamentarySessionsSpider(scrapy.Spider):
+    name = "parliamentarySessions"
     start_urls = [
         'https://www.parlament.gv.at/PAKT/PLENAR/filter.psp?view=RSS&jsMode=&xdocumentUri=&filterJq=&view=&MODUS=PLENAR&NRBRBV=NR&GP=XXVII&R_SISTEI=SI&listeId=1070&FBEZ=FP_007',
     ]
