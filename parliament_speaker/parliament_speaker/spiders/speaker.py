@@ -22,13 +22,14 @@ contentBlock = {
 # some consts
 regularTop = 'TOP'
 shortTop = 'Kurze Debatte'
+shortTopAbr = 'KD'
 urgentRequest = 'Dringl' # dringl anfrage / dringliche anfrage / ...
 hotTopic = 'Aktuelle Stunde:'
 randomTopic = '"'
 #speechTimeLimits = 'Blockredezeit'
 #speechTimeLimitSingles = 'Redezeitbeschränkungen'
 
-tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic]))
+tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic, shortTopAbr, shortTop]))
 
 
 cssSelectors = {
