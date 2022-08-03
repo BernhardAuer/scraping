@@ -2,6 +2,8 @@ import scrapy
 import re
 from enum import Enum
 from ..items import SpeakerItem
+from parliament_speaker.spiders.SpeakerItemParser import mapDictKeys
+from itemadapter import ItemAdapter
 
 class TableType(Enum):
     tableHeader = "table-header"
@@ -86,13 +88,18 @@ class QuotesSpider(scrapy.Spider):
             tableCaption = filteredCaptions[i] if i < len(filteredCaptions) else "unknown table"
             print("-----------------------------------------------------------------------------" + tableCaption)                 
             headerDict = self.getTableTextAsDict(table, TableType.tableHeader, None)
-            resultDict = self.getTableTextAsDict(table, TableType.tableContent, list(headerDict)[0])
+            resultDict = self.getTableTextAsDict(table, TableType.tableContent, (headerDict)[0])
             i += 1
-            yield from resultDict
+
+            for item in resultDict:
+                parsedSpeakerItem = mapDictKeys(item)
+                parsedSpeakerItem.Topic = tableCaption
+                yield parsedSpeakerItem
         
 
     def getTableTextAsDict(self, table, tableType, keyDict):
         parsedTable = Helper.parseTable(table, tableType)
+        contentList = []
         for row in parsedTable:
             parsedRow = Helper.parseRow(row, tableType)
             i = 0
@@ -106,5 +113,6 @@ class QuotesSpider(scrapy.Spider):
                     key = i
                 content[key] = parsedCell
                 i += 1
-            yield content
+            contentList.append(content)
+        return contentList
                             
