@@ -2,6 +2,8 @@ import scrapy
 import re
 from enum import Enum
 from ..items import SpeakerItem
+import sys
+import pymongo
 
 class TableType(Enum):
     tableHeader = "table-header"
@@ -67,12 +69,30 @@ class Helper():
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
-    start_urls = [
-        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00141/index.shtml',
-    ]
+    start_urls = []
     custom_settings = {
     "FEED_EXPORT_ENCODING": "utf-8"
     }
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongodb_uri=crawler.settings.get('MONGODB_URI'),
+            mongodb_db=crawler.settings.get('MONGODB_DATABASE', 'items')
+        )
+
+    def __init__(self, mongodb_uri, mongodb_db, *args, **kwargs):      
+        super(QuotesSpider, self).__init__(*args, **kwargs) 
+        self.mongodb_uri = mongodb_uri
+        self.mongodb_db = mongodb_db
+        if not self.mongodb_uri: sys.exit("You need to provide a Connection String.")
+        self.client = pymongo.MongoClient(self.mongodb_uri)
+        self.db = self.client[self.mongodb_db]
+        parliamentarySessions = self.db["parliamentarySessions"].find({}, {"_id":0,"Link":1})
+        # todo: close con
+        self.start_urls = [session["Link"] for session in parliamentarySessions]       
+        
+
    
     def parse(self, response):
         block = response.css('div.reiterBlock')[3]
