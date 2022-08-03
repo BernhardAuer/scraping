@@ -1,3 +1,4 @@
+from pickle import NONE
 import scrapy
 import re
 from enum import Enum
@@ -90,13 +91,19 @@ class QuotesSpider(scrapy.Spider):
         if not self.mongodb_uri: sys.exit("You need to provide a Connection String.")
         self.client = pymongo.MongoClient(self.mongodb_uri)
         self.db = self.client[self.mongodb_db]
-        parliamentarySessions = self.db["parliamentarySessions"].find({}, {"_id":0,"Link":1})
+        self.parliamentarySessions = list(self.db["parliamentarySessions"].find({}, {"_id":0,"Link":1, "Title":1, "Date":1})) # load into memory, cause this list is small
         # todo: close con
-        self.start_urls = [session["Link"] for session in parliamentarySessions]       
+        self.start_urls = [session["Link"] for session in self.parliamentarySessions]     
+          
         
 
    
     def parse(self, response):
+
+        currentUrl = response.request.url
+        currentParliamentarySession = list(filter(lambda x: x["Link"] == currentUrl, self.parliamentarySessions))[0] # single
+        print(currentUrl)
+        print(list(self.parliamentarySessions))
         block = response.css('div.reiterBlock')[3]
 
         captions = block.css('h3::text, h6 a::text').getall()
@@ -114,6 +121,7 @@ class QuotesSpider(scrapy.Spider):
             for item in resultDict:
                 parsedSpeakerItem = mapDictKeys(item)
                 parsedSpeakerItem.Topic = tableCaption
+                parsedSpeakerItem.ParliamentarySessionTitle = currentParliamentarySession["Title"]
                 yield parsedSpeakerItem
         
 

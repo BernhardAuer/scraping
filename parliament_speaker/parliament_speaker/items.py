@@ -19,6 +19,7 @@ class SpeakerItem:
     TimeLimit: str
     LengthOfSpeech: str
     TypeOfSpeech: str
+    ParliamentarySessionTitle: str = field(init=False)
     Topic: str = field(init=False)  
     SpeechNumberOfTopicByAuthorRaw: InitVar[str] = None
     HasSpeechFinishedRaw: InitVar[str] = None
