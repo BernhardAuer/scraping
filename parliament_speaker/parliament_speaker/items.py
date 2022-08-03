@@ -19,8 +19,10 @@ class SpeakerItem:
     TimeLimit: str
     LengthOfSpeech: str
     TypeOfSpeech: str
+    Topic: str = field(init=False)  
     SpeechNumberOfTopicByAuthorRaw: InitVar[str] = None
     HasSpeechFinishedRaw: InitVar[str] = None
+
     def __post_init__(self, SpeechNumberOfTopicByAuthorRaw, HasSpeechFinishedRaw): # order is relevant... OMG!!!!!!
         if HasSpeechFinishedRaw== '+':
             self.HasSpeechFinished = True

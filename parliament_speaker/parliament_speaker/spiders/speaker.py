@@ -93,6 +93,7 @@ class QuotesSpider(scrapy.Spider):
 
             for item in resultDict:
                 parsedSpeakerItem = mapDictKeys(item)
+                parsedSpeakerItem.Topic = tableCaption
                 yield parsedSpeakerItem
         
 
