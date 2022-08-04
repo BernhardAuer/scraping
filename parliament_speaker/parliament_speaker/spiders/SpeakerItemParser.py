@@ -12,7 +12,7 @@ mappingDict = {
         "Anz. WM": "SpeechNumberOfTopicByAuthorRaw",
         "Art der Wortmeldung WM": "TypeOfSpeech",
         "Start": "Start",
-        "Dauer": "LengthOfSpeech",
+        "Dauer": "LengthOfSpeechRaw",
         "Limit": "TimeLimit"
     }
     
