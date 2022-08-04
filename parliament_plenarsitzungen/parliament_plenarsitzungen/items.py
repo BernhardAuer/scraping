@@ -20,7 +20,9 @@ class ParliamentPlenarsitzungenItem():
     Link: str
     DateRaw: InitVar[str] = None
     def __post_init__(self, DateRaw):
+        # strip time & timezone information to prevent any UTC conversion issues  e.g. '08 Jul 2022 00:00:00 +0200' ->  '08 Jul 2022'
+        DateRaw = DateRaw[:len(DateRaw) - 15]
         self.Date = datetime.strptime(
                 DateRaw,
-                "%d %b %Y %H:%M:%S %z"
+                "%d %b %Y"
             )
