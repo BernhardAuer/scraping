@@ -1,7 +1,10 @@
+from pickle import NONE
 import scrapy
 import re
 from enum import Enum
 from ..items import SpeakerItem
+import sys
+import pymongo
 from parliament_speaker.spiders.SpeakerItemParser import mapDictKeys
 from itemadapter import ItemAdapter
 
@@ -19,13 +22,14 @@ contentBlock = {
 # some consts
 regularTop = 'TOP'
 shortTop = 'Kurze Debatte'
+shortTopAbr = 'KD'
 urgentRequest = 'Dringl' # dringl anfrage / dringliche anfrage / ...
 hotTopic = 'Aktuelle Stunde:'
 randomTopic = '"'
 #speechTimeLimits = 'Blockredezeit'
 #speechTimeLimitSingles = 'Redezeitbeschränkungen'
 
-tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic]))
+tableCaptionsStartChars = list(map(lambda x: x.casefold().strip(), [regularTop, urgentRequest, hotTopic, randomTopic, shortTopAbr, shortTop]))
 
 
 cssSelectors = {
@@ -69,14 +73,38 @@ class Helper():
 
 class QuotesSpider(scrapy.Spider):
     name = "topics"
-    start_urls = [
-        'https://www.parlament.gv.at/PAKT/VHG/XXVII/NRSITZ/NRSITZ_00141/index.shtml',
-    ]
+    start_urls = []
     custom_settings = {
     "FEED_EXPORT_ENCODING": "utf-8"
     }
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongodb_uri=crawler.settings.get('MONGODB_URI'),
+            mongodb_db=crawler.settings.get('MONGODB_DATABASE', 'items')
+        )
+
+    def __init__(self, mongodb_uri, mongodb_db, *args, **kwargs):      
+        super(QuotesSpider, self).__init__(*args, **kwargs) 
+        self.mongodb_uri = mongodb_uri
+        self.mongodb_db = mongodb_db
+        if not self.mongodb_uri: sys.exit("You need to provide a Connection String.")
+        self.client = pymongo.MongoClient(self.mongodb_uri)
+        self.db = self.client[self.mongodb_db]
+        self.parliamentarySessions = list(self.db["parliamentarySessions"].find({}, {"_id":0,"Link":1, "Title":1, "Date":1})) # load into memory, cause this list is small
+        # todo: close con
+        self.start_urls = [session["Link"] for session in self.parliamentarySessions]     
+          
+        
+
    
     def parse(self, response):
+
+        currentUrl = response.request.url
+        currentParliamentarySession = list(filter(lambda x: x["Link"] == currentUrl, self.parliamentarySessions))[0] # single
+        print(currentUrl)
+        print(list(self.parliamentarySessions))
         block = response.css('div.reiterBlock')[3]
 
         captions = block.css('h3::text, h6 a::text').getall()
@@ -94,6 +122,8 @@ class QuotesSpider(scrapy.Spider):
             for item in resultDict:
                 parsedSpeakerItem = mapDictKeys(item)
                 parsedSpeakerItem.Topic = tableCaption
+                parsedSpeakerItem.ParliamentarySessionTitle = currentParliamentarySession["Title"]
+                parsedSpeakerItem.setDate(currentParliamentarySession["Date"])
                 yield parsedSpeakerItem
         
 

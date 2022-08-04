@@ -11,9 +11,9 @@ mappingDict = {
         "Redner/-innen": "NameOfSpeaker",
         "Anz. WM": "SpeechNumberOfTopicByAuthorRaw",
         "Art der Wortmeldung WM": "TypeOfSpeech",
-        "Start": "Start",
-        "Dauer": "LengthOfSpeech",
-        "Limit": "TimeLimit"
+        "Start": "StartTimeRaw",
+        "Dauer": "LengthOfSpeechRaw",
+        "Limit": "TimeLimitRaw"
     }
     
 def mapDictKeys(dict):

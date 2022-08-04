@@ -24,7 +24,7 @@ class TransformPipeline:
 
 class MongoDBPipeline:
 
-    collection = 'scrapy_items'
+    collection = 'parliamentarySpeeches'
 
     def __init__(self, mongodb_uri, mongodb_db):
         self.mongodb_uri = mongodb_uri
