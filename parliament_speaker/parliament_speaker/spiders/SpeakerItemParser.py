@@ -13,7 +13,7 @@ mappingDict = {
         "Art der Wortmeldung WM": "TypeOfSpeech",
         "Start": "Start",
         "Dauer": "LengthOfSpeechRaw",
-        "Limit": "TimeLimit"
+        "Limit": "TimeLimitRaw"
     }
     
 def mapDictKeys(dict):
