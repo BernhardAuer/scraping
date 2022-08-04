@@ -11,7 +11,7 @@ mappingDict = {
         "Redner/-innen": "NameOfSpeaker",
         "Anz. WM": "SpeechNumberOfTopicByAuthorRaw",
         "Art der Wortmeldung WM": "TypeOfSpeech",
-        "Start": "Start",
+        "Start": "StartTimeRaw",
         "Dauer": "LengthOfSpeechRaw",
         "Limit": "TimeLimitRaw"
     }

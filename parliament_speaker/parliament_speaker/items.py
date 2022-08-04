@@ -4,7 +4,7 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 from dataclasses import dataclass, field, InitVar
-from datetime import date
+from datetime import date, datetime
 from operator import truediv
 import re
 
@@ -16,7 +16,8 @@ class SpeakerItem:
     SpeechNumberOfTopicByAuthor: int = field(init=False)
     NameOfSpeaker : str
     TypeOfSpeech : str
-    Start: str
+    StartTimeRaw: InitVar[str] = None
+    StartDatetime: datetime = field(init=False)  
     TimeLimitRaw: InitVar[str] = None
     TimeLimitInSec: int = field(init=False, default=0)    
     IsVoluntaryTimeLimit: bool = field(init=False)
@@ -28,7 +29,8 @@ class SpeakerItem:
     SpeechNumberOfTopicByAuthorRaw: InitVar[str] = None
     HasSpeechFinishedRaw: InitVar[str] = None
 
-    def __post_init__(self, TimeLimitRaw, LengthOfSpeechRaw, SpeechNumberOfTopicByAuthorRaw, HasSpeechFinishedRaw): # order is relevant... OMG!!!!!!
+    def __post_init__(self, StartTimeRaw, TimeLimitRaw, LengthOfSpeechRaw, SpeechNumberOfTopicByAuthorRaw, HasSpeechFinishedRaw): # order is relevant... OMG!!!!!!
+        self.StartTimeRawTemp = StartTimeRaw # this value will not be serialized
         if TimeLimitRaw != "":
             regexResult = re.search("^(\d*)(\*{0,1})$", TimeLimitRaw) 
             min = int(regexResult.group(1)) if regexResult.group(1) is not None else 0
@@ -52,6 +54,9 @@ class SpeakerItem:
 
         self.Nr = int(self.Nr)
 
-
+    def setDate(self, parliamentarySessionDate):
+        if self.StartTimeRawTemp != "":
+            parsedStartTime = datetime.strptime(self.StartTimeRawTemp, "%H:%M").time()
+            self.StartDatetime = datetime.combine(parliamentarySessionDate, parsedStartTime)
         
 

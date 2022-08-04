@@ -123,6 +123,7 @@ class QuotesSpider(scrapy.Spider):
                 parsedSpeakerItem = mapDictKeys(item)
                 parsedSpeakerItem.Topic = tableCaption
                 parsedSpeakerItem.ParliamentarySessionTitle = currentParliamentarySession["Title"]
+                parsedSpeakerItem.setDate(currentParliamentarySession["Date"])
                 yield parsedSpeakerItem
         
 
